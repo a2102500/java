@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+
+    <!--给需要使用的类一个id,然后把该类路径放入class中 -->
+    <bean id="helloWorldImpl1" class="com.xrq.aop.HelloWorldImpl1" />
+    <bean id="helloWorldImpl2" class="com.xrq.aop.HelloWorldImpl2" />
+    <bean id="timeHandler" class="com.xrq.aop.TimeHandler" />
+    <bean id="logHandler" class="com.xrq.aop.LogHandler"/>
+
+    <aop:config>
+        <!--order是横切点的顺序属性-->
+        <aop:aspect id="time" ref="timeHandler" order="2">
+            <!--execution后第一个*表示任意返回值类型,com那个包名也可以用后面加*表示通配,第二个*表示所有方法(方法名通配),最后的..表示通配方法可以有0个或多个参数 -->
+            <aop:pointcut id="addAllMethod" expression="execution(* com.xrq.aop.HelloWorld.*(..))" />
+            <!-- aop的before功能,在源类所有方法前,添加method里的方法 -->
+            <aop:before method="printTime" pointcut-ref="addAllMethod" />
+            <!-- aop的after功能,在源类所有方法后,添加method里的方法 -->
+            <aop:after method="printTime" pointcut-ref="addAllMethod" />
+        </aop:aspect>
+    </aop:config>
+
+    <aop:config>
+        <aop:aspect id="log" ref="logHandler" order="1">
+            <aop:pointcut id="printLog" expression="execution(* com.xrq.aop.HelloWorld.*(..))"/>
+            <aop:before method="LogBefore" pointcut-ref="printLog"/>
+            <aop:after method="LogAfter" pointcut-ref="printLog"/>
+        </aop:aspect>
+
+    </aop:config>
+
+
+</beans>
